@@ -1,0 +1,93 @@
+# OpenClaw Docker Deploy Skill 🐳
+
+**Version**: v1.0.0  
+**Created**: 2026-03-29  
+**Author**: 叶萌
+
+Deploy OpenClaw agents in isolated Docker containers with multi-instance support, automated model configuration, and production-ready health checks.
+
+## Features
+
+- ✅ **Isolated Deployment** - Each agent runs in its own container
+- ✅ **Multi-Instance** - Deploy multiple agents with different ports
+- ✅ **Auto Configuration** - Automatic model setup on first startup
+- ✅ **Health Checks** - Built-in health monitoring
+- ✅ **Management Scripts** - Deploy, verify, list, stop, remove
+- ✅ **Templates** - Docker Compose templates for single/multi deployment
+
+## Quick Start
+
+### Install
+
+```bash
+# Clone or copy this skill to your workspace
+cd /home/leoye/.openclaw/workspace/skills/openclaw-docker-deploy
+```
+
+### Deploy Single Agent
+
+```bash
+./scripts/deploy-agent.sh --name my-agent --port 18888 --api-key sk-xxx
+```
+
+### Deploy Multiple Agents
+
+```bash
+# Using docker run
+docker run -d --name agent-1 -p 18891:18789 -e QWEN_API_KEY=sk-xxx docker-openclaw-openclaw
+docker run -d --name agent-2 -p 18892:18789 -e QWEN_API_KEY=sk-xxx docker-openclaw-openclaw
+
+# Or using docker compose
+docker compose -f templates/docker-compose.multi.yml up -d
+```
+
+### Verify
+
+```bash
+./scripts/verify-deployment.sh --name my-agent
+```
+
+### Chat
+
+```bash
+docker exec -it my-agent openclaw agent --session-id chat --message "你好"
+```
+
+## Scripts
+
+| Script | Description |
+|--------|-------------|
+| `deploy-agent.sh` | Deploy new agent with custom name/port |
+| `verify-deployment.sh` | Verify deployment (5-point check) |
+| `list-agents.sh` | List all OpenClaw agents |
+| `stop-agent.sh` | Stop an agent |
+| `remove-agent.sh` | Remove an agent |
+
+## Templates
+
+| Template | Description |
+|----------|-------------|
+| `docker-compose.single.yml` | Single agent deployment |
+| `docker-compose.multi.yml` | Multi-agent deployment (3 agents) |
+
+## Examples
+
+See `examples/deploy-example.sh` for a complete deployment workflow demonstration.
+
+## Documentation
+
+Full SOP documentation: `/home/leoye/.openclaw/workspace/docs/docker-deployment-sop.md`
+
+## Version History
+
+### v1.0.0 (2026-03-29)
+
+- Initial release
+- Deploy/verify/list/stop/remove scripts
+- Docker Compose templates
+- Complete SOP documentation
+- GitHub version control
+
+## License
+
+MIT

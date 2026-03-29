@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  openclaw:
+    image: docker-openclaw-openclaw
+    container_name: openclaw-agent
+    ports:
+      - "18888:18789"
+    environment:
+      - QWEN_API_KEY=${QWEN_API_KEY:-sk-your-key-here}
+      - NODE_OPTIONS=--max-old-space-size=2048
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:18789/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

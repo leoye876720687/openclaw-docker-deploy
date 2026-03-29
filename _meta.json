@@ -1,0 +1,10 @@
+{
+  "name": "openclaw-docker-deploy",
+  "version": "1.0.0",
+  "description": "Deploy OpenClaw agents in isolated Docker containers",
+  "author": "叶萌",
+  "created": "2026-03-29",
+  "homepage": "https://github.com/leoye876720687/openclaw-docker-deploy",
+  "license": "MIT",
+  "tags": ["docker", "deployment", "openclaw", "container", "agent"]
+}

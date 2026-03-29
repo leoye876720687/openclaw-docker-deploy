@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  agent-1:
+    image: docker-openclaw-openclaw
+    container_name: openclaw-agent-1
+    ports:
+      - "18891:18789"
+    environment:
+      - QWEN_API_KEY=${QWEN_API_KEY_1:-sk-key-1}
+      - NODE_OPTIONS=--max-old-space-size=2048
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:18789/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  agent-2:
+    image: docker-openclaw-openclaw
+    container_name: openclaw-agent-2
+    ports:
+      - "18892:18789"
+    environment:
+      - QWEN_API_KEY=${QWEN_API_KEY_2:-sk-key-2}
+      - NODE_OPTIONS=--max-old-space-size=2048
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:18789/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  agent-3:
+    image: docker-openclaw-openclaw
+    container_name: openclaw-agent-3
+    ports:
+      - "18893:18789"
+    environment:
+      - QWEN_API_KEY=${QWEN_API_KEY_3:-sk-key-3}
+      - NODE_OPTIONS=--max-old-space-size=2048
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:18789/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
