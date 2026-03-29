@@ -30,6 +30,16 @@ cd /home/leoye/.openclaw/workspace/skills/openclaw-docker-deploy
 ./scripts/deploy-agent.sh --name my-agent --port 18888 --api-key sk-xxx
 ```
 
+### Deploy Specialized Agents (NEW!)
+
+```bash
+# Deploy 3 data analyst agents
+./scripts/deploy-specialized-agents.sh --role data-analyst --count 3 --base-port 19000
+
+# Deploy 5 coding experts
+./scripts/deploy-specialized-agents.sh --role coding-expert --count 5 --base-port 19100
+```
+
 ### Deploy Multiple Agents
 
 ```bash
@@ -77,6 +87,18 @@ docker exec my-agent openclaw agent --session-id chat --message "你好"
 |----------|-------------|
 | `docker-compose.single.yml` | Single agent deployment |
 | `docker-compose.multi.yml` | Multi-agent deployment (3 agents) |
+
+## Roles (Specialized Agents)
+
+| Role | Description | Use Cases |
+|------|-------------|-----------|
+| `data-analyst` | Data analysis expert | Data processing, statistics, visualization |
+| `coding-expert` | Full-stack developer | Code generation, review, debugging |
+| `devops-expert` | Infrastructure expert | Deployment, monitoring, troubleshooting |
+| `decision-maker` | Strategic advisor | Analysis, evaluation, planning |
+| `qa-expert` | Quality assurance | Testing, verification, review |
+
+See `docs/SPECIALIZED-AGENTS.md` for details.
 
 ## Examples
 
