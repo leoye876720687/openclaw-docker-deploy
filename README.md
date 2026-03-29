@@ -50,7 +50,14 @@ docker compose -f templates/docker-compose.multi.yml up -d
 ### Chat
 
 ```bash
-docker exec -it my-agent openclaw agent --session-id chat --message "你好"
+# Direct command
+docker exec my-agent openclaw agent --session-id chat --message "你好"
+
+# Using router (recommended)
+./scripts/router.sh -c my-agent "你好"
+
+# Round-robin mode
+./scripts/router.sh -r "处理任务"
 ```
 
 ## Scripts
@@ -62,6 +69,7 @@ docker exec -it my-agent openclaw agent --session-id chat --message "你好"
 | `list-agents.sh` | List all OpenClaw agents |
 | `stop-agent.sh` | Stop an agent |
 | `remove-agent.sh` | Remove an agent |
+| `router.sh` | Route messages to containers |
 
 ## Templates
 

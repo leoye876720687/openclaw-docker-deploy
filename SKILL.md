@@ -65,6 +65,28 @@ docker run -d --name openclaw-agent-2 -p 18892:18789 \
 ./scripts/remove-agent.sh --name openclaw-agent-1
 ```
 
+### Router (Route to Containers)
+
+```bash
+# Route to specific container
+./scripts/router.sh -c openclaw-agent-1 "你好"
+
+# Route by port
+./scripts/router.sh -p 18892 "帮我分析数据"
+
+# Auto select (first healthy)
+./scripts/router.sh -a "今天天气怎么样"
+
+# Round-robin (auto switch)
+./scripts/router.sh -r "处理这个任务"
+
+# List containers
+./scripts/router.sh -l
+
+# Show status
+./scripts/router.sh -s
+```
+
 ## Configuration
 
 ### Environment Variables
