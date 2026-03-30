@@ -1,7 +1,8 @@
 # OpenClaw Docker Deploy Skill 🐳
 
-**Version**: v1.0.0  
+**Version**: v1.1.0  
 **Created**: 2026-03-29  
+**Updated**: 2026-03-30  
 **Author**: 叶萌
 
 Deploy OpenClaw agents in isolated Docker containers with multi-instance support, automated model configuration, and production-ready health checks.
@@ -75,11 +76,34 @@ docker exec my-agent openclaw agent --session-id chat --message "你好"
 | Script | Description |
 |--------|-------------|
 | `deploy-agent.sh` | Deploy new agent with custom name/port |
+| `init-agent-container.sh` | **NEW!** Initialize container directories and configuration |
 | `verify-deployment.sh` | Verify deployment (5-point check) |
 | `list-agents.sh` | List all OpenClaw agents |
 | `stop-agent.sh` | Stop an agent |
 | `remove-agent.sh` | Remove an agent |
 | `router.sh` | Route messages to containers |
+
+### init-agent-container.sh (NEW!)
+
+Automatically initializes container directory structure and configuration after deployment:
+
+```bash
+# Initialize with auth profiles
+./scripts/init-agent-container.sh <container-name> [auth-profiles-source] [models-source]
+
+# Example
+./scripts/init-agent-container.sh openclaw-agent-4 \
+  ~/.openclaw/agents/agent-4/agent/auth-profiles.json \
+  ~/.openclaw/agents/agent-4/models.json
+```
+
+**What it does:**
+1. Creates `agents/main/agent/` and `agents/main/sessions/` directories
+2. Copies `auth-profiles.json` and `models.json` to container
+3. Sets correct permissions (openclaw:openclaw, 600 for auth files)
+4. Configures default model to `qwen-portal/coder-model`
+
+**Note:** Now called automatically by `deploy-agent.sh` after container startup.
 
 ## Templates
 
@@ -109,6 +133,27 @@ See `examples/deploy-example.sh` for a complete deployment workflow demonstratio
 Full SOP documentation: `/home/leoye/.openclaw/workspace/docs/docker-deployment-sop.md`
 
 ## Version History
+
+### v1.1.0 (2026-03-30) - Container Initialization Fix
+
+**Critical Bug Fix:** Fixed `EACCES: permission denied` error when creating sessions directory.
+
+**Changes:**
+- ✅ Added `init-agent-container.sh` script for automatic container initialization
+- ✅ Fixed missing `sessions/` directory causing agent failures
+- ✅ Auto-configure default model to `qwen-portal/coder-model`
+- ✅ Updated `deploy-agent.sh` to call initialization automatically
+- ✅ Proper permission handling for all agent directories
+
+**Usage:**
+```bash
+# Manual initialization (if needed)
+./scripts/init-agent-container.sh openclaw-agent-4 \
+  ~/.openclaw/agents/agent-4/agent/auth-profiles.json
+
+# Or just use deploy-agent.sh (calls init automatically)
+./scripts/deploy-agent.sh --name my-agent --port 18888 --api-key sk-xxx
+```
 
 ### v1.0.0 (2026-03-29)
 

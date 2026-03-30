@@ -216,7 +216,14 @@ docker rm openclaw-agent
 
 ## Version
 
-v1.0.0 (2026-03-29)
+- **v1.1.0** (2026-03-30) - Fixed container initialization
+  - ✅ Added `init-agent-container.sh` script for automatic directory structure setup
+  - ✅ Fixed missing `sessions/` directory causing `EACCES: permission denied` errors
+  - ✅ Auto-configure default model to `qwen-portal/coder-model` (avoid Anthropic dependency)
+  - ✅ Updated `deploy-agent.sh` to call initialization script after container startup
+  - ✅ Proper permission handling for all agent directories
+
+- **v1.0.0** (2026-03-29) - Initial release
 
 ## License
 

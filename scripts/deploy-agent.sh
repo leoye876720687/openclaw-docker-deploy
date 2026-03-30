@@ -76,6 +76,9 @@ if docker ps -a --format '{{.Names}}' | grep -q "^${NAME}$"; then
     fi
 fi
 
+# Get script directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Deploy
 echo "🚀 Deploying container..."
 docker run -d \
@@ -88,6 +91,21 @@ docker run -d \
 # Wait for startup
 echo "⏳ Waiting for Gateway initialization..."
 sleep 10
+
+# Initialize container directories and configuration
+echo ""
+echo "📁 Initializing container configuration..."
+if [ -f "$SCRIPT_DIR/init-agent-container.sh" ]; then
+    bash "$SCRIPT_DIR/init-agent-container.sh" $NAME
+else
+    # Fallback: create directories manually
+    echo "⚠️  init-agent-container.sh not found, using fallback..."
+    docker exec -u root $NAME mkdir -p \
+      /home/openclaw/.openclaw/.openclaw/agents/main/agent \
+      /home/openclaw/.openclaw/.openclaw/agents/main/sessions
+    docker exec -u root $NAME chown -R openclaw:openclaw \
+      /home/openclaw/.openclaw/.openclaw/agents/main
+fi
 
 # Verify
 echo ""
@@ -103,6 +121,11 @@ fi
 echo ""
 echo "=== Model Configuration ==="
 docker logs $NAME 2>&1 | grep "agent model" | tail -1
+
+# Test directory structure
+echo ""
+echo "=== Directory Structure ==="
+docker exec $NAME ls -la /home/openclaw/.openclaw/.openclaw/agents/main/ 2>/dev/null && echo "✅ Directory structure OK" || echo "⚠️  Directory structure may need manual setup"
 
 echo ""
 echo "============================================"
