@@ -45,20 +45,31 @@ docker exec -u root $CONTAINER_NAME mkdir -p \
 echo "✅ Directory structure created"
 echo ""
 
+# Copy full openclaw.json from host (includes models configuration)
+echo "📋 Copying openclaw.json (with models configuration)..."
+if [ -f "$HOME/.openclaw/openclaw.json" ]; then
+    docker cp "$HOME/.openclaw/openclaw.json" $CONTAINER_NAME:/home/openclaw/.openclaw/.openclaw/openclaw.json
+    docker exec -u root $CONTAINER_NAME chown openclaw:openclaw /home/openclaw/.openclaw/.openclaw/openclaw.json
+    echo "✅ openclaw.json copied"
+else
+    echo "⚠️  Host openclaw.json not found, using container defaults"
+fi
+echo ""
+
 # Copy auth-profiles.json if source exists
 if [ -f "$AUTH_PROFILES_SOURCE" ]; then
     echo "📋 Copying auth-profiles.json..."
+    # Copy to main agent
     docker cp "$AUTH_PROFILES_SOURCE" $CONTAINER_NAME:/home/openclaw/.openclaw/.openclaw/agents/main/agent/auth-profiles.json
+    # Copy to default agent
     docker cp "$AUTH_PROFILES_SOURCE" $CONTAINER_NAME:/home/openclaw/.openclaw/.openclaw/agents/default/agent/auth-profiles.json
     echo "✅ auth-profiles.json copied"
 else
     echo "⚠️  auth-profiles.json source not found: $AUTH_PROFILES_SOURCE"
-    echo "   You can copy it manually later:"
-    echo "   docker cp <path-to-auth-profiles.json> $CONTAINER_NAME:/home/openclaw/.openclaw/.openclaw/agents/main/agent/auth-profiles.json"
 fi
 echo ""
 
-# Copy models.json if source exists
+# Copy models.json if source exists (for agent-specific model definitions)
 if [ -f "$MODELS_SOURCE" ]; then
     echo "📋 Copying models.json..."
     docker cp "$MODELS_SOURCE" $CONTAINER_NAME:/home/openclaw/.openclaw/.openclaw/agents/main/models.json
@@ -77,12 +88,23 @@ docker exec -u root $CONTAINER_NAME chown -R openclaw:openclaw \
 docker exec -u root $CONTAINER_NAME chmod 600 \
   /home/openclaw/.openclaw/.openclaw/agents/main/agent/auth-profiles.json \
   /home/openclaw/.openclaw/.openclaw/agents/default/agent/auth-profiles.json 2>/dev/null || true
+
+# Create /home/leoye directory (required for some operations)
+docker exec -u root $CONTAINER_NAME mkdir -p /home/leoye
+docker exec -u root $CONTAINER_NAME chown openclaw:openclaw /home/leoye
 echo "✅ Permissions set"
 echo ""
 
-# Set default model to Qwen (avoid Anthropic dependency)
-echo "🤖 Setting default model to qwen-portal/coder-model..."
-docker exec $CONTAINER_NAME openclaw config set agents.defaults.model qwen-portal/coder-model 2>&1 | grep -v "^Config overwrite" || true
+# Remove invalid plugin configurations (prevent startup warnings)
+echo "🧹 Cleaning up invalid plugin configs..."
+docker exec $CONTAINER_NAME openclaw config unset plugins.entries.feishu-openclaw-plugin 2>/dev/null || true
+docker exec $CONTAINER_NAME openclaw config unset plugins.allow 2>/dev/null || true
+echo "✅ Plugin config cleaned"
+echo ""
+
+# Set default model to Aliyun Qwen (API key based, no OAuth expiry issues)
+echo "🤖 Setting default model to aliyun-qwen/qwen3.5-plus..."
+docker exec $CONTAINER_NAME openclaw config set agents.defaults.model aliyun-qwen/qwen3.5-plus 2>&1 | grep -v "^Config overwrite" || true
 echo "✅ Default model configured"
 echo ""
 
