@@ -94,8 +94,8 @@ fi
 # Check 5: Conversation test
 echo ""
 echo "[5/5] Conversation Test:"
-RESPONSE=$(docker exec $NAME openclaw agent --session-id verify-test --message "测试" --timeout 10 2>&1 | head -1)
-if [ -n "$RESPONSE" ] && ! echo "$RESPONSE" | grep -q "error\|Error\|failed"; then
+RESPONSE=$(docker exec $NAME openclaw agent --session-id verify-test --message "只回复OK" --timeout 20 2>&1 | head -3)
+if [ -n "$RESPONSE" ] && ! echo "$RESPONSE" | grep -qi "error\|failed\|timed out\|timeout"; then
     echo "   ✅ Response received"
     echo "   Preview: ${RESPONSE:0:50}..."
 else

@@ -90,7 +90,31 @@ docker run -d \
 
 # Wait for startup
 echo "⏳ Waiting for Gateway initialization..."
-sleep 10
+ready=false
+for _ in $(seq 1 24); do
+    status=$(docker inspect -f '{{.State.Status}}' "$NAME" 2>/dev/null || true)
+    health=$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{end}}' "$NAME" 2>/dev/null || true)
+
+    if [ "$status" = "running" ] && { [ -z "$health" ] || [ "$health" = "healthy" ] || [ "$health" = "starting" ]; }; then
+        ready=true
+        break
+    fi
+
+    if [ "$status" = "exited" ] || [ "$status" = "dead" ]; then
+        echo "❌ Container exited during startup"
+        docker logs "$NAME" --tail 80 2>&1 || true
+        exit 1
+    fi
+
+    sleep 2
+done
+
+if [ "$ready" != "true" ]; then
+    echo "❌ Container did not become ready in time"
+    docker ps -a --filter "name=$NAME" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+    docker logs "$NAME" --tail 80 2>&1 || true
+    exit 1
+fi
 
 # Initialize container directories and configuration
 echo ""

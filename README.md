@@ -104,6 +104,8 @@ Automatically initializes container directory structure and configuration after 
 4. Configures default model to `qwen-portal/coder-model`
 
 **Note:** Now called automatically by `deploy-agent.sh` after container startup.
+By default it keeps the container isolated and does not copy the host `openclaw.json`.
+If you explicitly need to import the host config, set `OPENCLAW_COPY_HOST_CONFIG=1` before running the script.
 
 ## Templates
 

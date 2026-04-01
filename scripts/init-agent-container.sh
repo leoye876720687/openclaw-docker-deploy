@@ -7,6 +7,7 @@ set -e
 CONTAINER_NAME="$1"
 AUTH_PROFILES_SOURCE="${2:-$HOME/.openclaw/agents/main/agent/auth-profiles.json}"
 MODELS_SOURCE="${3:-$HOME/.openclaw/agents/main/models.json}"
+COPY_HOST_CONFIG="${OPENCLAW_COPY_HOST_CONFIG:-0}"
 
 if [ -z "$CONTAINER_NAME" ]; then
     echo "Usage: $0 <container-name> [auth-profiles-source] [models-source]"
@@ -45,14 +46,15 @@ docker exec -u root $CONTAINER_NAME mkdir -p \
 echo "✅ Directory structure created"
 echo ""
 
-# Copy full openclaw.json from host (includes models configuration)
-echo "📋 Copying openclaw.json (with models configuration)..."
-if [ -f "$HOME/.openclaw/openclaw.json" ]; then
-    docker cp "$HOME/.openclaw/openclaw.json" $CONTAINER_NAME:/home/openclaw/.openclaw/.openclaw/openclaw.json
-    docker exec -u root $CONTAINER_NAME chown openclaw:openclaw /home/openclaw/.openclaw/.openclaw/openclaw.json
-    echo "✅ openclaw.json copied"
+# Keep the container isolated by default.
+# Copying the host config drags in host-only plugins, bot tokens, and workspace paths.
+echo "📋 Preparing container config..."
+if [ "$COPY_HOST_CONFIG" = "1" ] && [ -f "$HOME/.openclaw/openclaw.json" ]; then
+  docker cp "$HOME/.openclaw/openclaw.json" $CONTAINER_NAME:/home/openclaw/.openclaw/.openclaw/openclaw.json
+  docker exec -u root $CONTAINER_NAME chown openclaw:openclaw /home/openclaw/.openclaw/.openclaw/openclaw.json
+  echo "✅ Host openclaw.json copied (OPENCLAW_COPY_HOST_CONFIG=1)"
 else
-    echo "⚠️  Host openclaw.json not found, using container defaults"
+  echo "✅ Using container-generated openclaw.json"
 fi
 echo ""
 
