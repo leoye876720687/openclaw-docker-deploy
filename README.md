@@ -1,8 +1,8 @@
 # OpenClaw Docker Deploy Skill 🐳
 
-**Version**: v1.1.0  
+**Version**: v1.0.2  
 **Created**: 2026-03-29  
-**Updated**: 2026-03-30  
+**Updated**: 2026-04-02  
 **Author**: 叶萌
 
 Deploy OpenClaw agents in isolated Docker containers with multi-instance support, automated model configuration, and production-ready health checks.
@@ -101,7 +101,7 @@ Automatically initializes container directory structure and configuration after 
 1. Creates `agents/main/agent/` and `agents/main/sessions/` directories
 2. Copies `auth-profiles.json` and `models.json` to container
 3. Sets correct permissions (openclaw:openclaw, 600 for auth files)
-4. Configures default model to `qwen-portal/coder-model`
+4. Configures default model to `aliyun-qwen/qwen3.5-plus`
 
 **Note:** Now called automatically by `deploy-agent.sh` after container startup.
 By default it keeps the container isolated and does not copy the host `openclaw.json`.
@@ -136,26 +136,19 @@ Full SOP documentation: `/home/leoye/.openclaw/workspace/docs/docker-deployment-
 
 ## Version History
 
-### v1.1.0 (2026-03-30) - Container Initialization Fix
-
-**Critical Bug Fix:** Fixed `EACCES: permission denied` error when creating sessions directory.
+### v1.0.2 (2026-04-02) - Deployment Reliability Fix
 
 **Changes:**
-- ✅ Added `init-agent-container.sh` script for automatic container initialization
-- ✅ Fixed missing `sessions/` directory causing agent failures
-- ✅ Auto-configure default model to `qwen-portal/coder-model`
-- ✅ Updated `deploy-agent.sh` to call initialization automatically
-- ✅ Proper permission handling for all agent directories
+- ✅ Wait for container readiness before initialization instead of relying on a fixed sleep
+- ✅ Verification script now fails correctly on timeout output
+- ✅ Confirmed healthy deployment, HTTP health checks, and multi-turn chat stability
 
-**Usage:**
-```bash
-# Manual initialization (if needed)
-./scripts/init-agent-container.sh openclaw-agent-4 \
-  ~/.openclaw/agents/agent-4/agent/auth-profiles.json
+### v1.0.1 (2026-04-01) - Isolation And Gateway Reliability Fix
 
-# Or just use deploy-agent.sh (calls init automatically)
-./scripts/deploy-agent.sh --name my-agent --port 18888 --api-key sk-xxx
-```
+**Changes:**
+- ✅ Keep containers isolated by default instead of copying host `openclaw.json`
+- ✅ Document the isolated-config behavior in the init script workflow
+- ✅ Validate host health endpoint and gateway startup path for containerized deployment
 
 ### v1.0.0 (2026-03-29)
 
